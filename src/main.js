@@ -1,4 +1,3 @@
-
 var Parse = require('parse/index');
 var _ = require('underscore');
 
@@ -6,10 +5,12 @@ var config = require('./appConfig.json');
 
 var Settings = require('./Settings');
 var cloudinary = require('./Cloudinary');
+
+
 //console.log("DEBUG "+JSON.stringify(Parse));
 
-var PAGE_MARGIN = 16;
 var books = require("./books.json");
+var performanceList = [];//require("./performances.json");
 
 Parse.initialize('E6h4Kw98VnlzpKsvUbaRq1wPnSEJHnfzChbYNG3c', '2pKmpiYpRzqnbnlsHGIcXRR9YyrfMsKUxSjqFxrE');
 
@@ -30,43 +31,32 @@ tabris.create("PageSelector", {
 	}
 }).appendTo(drawer);
 
-Parse.Cloud.run('getFrontpageItems')
-	.then(function(res){
-		console.log("DDD",res)
-	});
 
-var loremIpsum = "Etiam nisl nisi, egestas quis lacus ut, tristique suscipit metus. In " +
-	"vehicula lectus metus, at accumsan elit fringilla blandit. Integer et quam " +
-	"sed dolor pharetra molestie id eget dui. Donec ac libero eu lectus dapibus " +
-	"placerat eu a tellus. Fusce vulputate ac sem sit amet bibendum. Pellentesque " +
-	"euismod varius purus nec pharetra. Sed vitae ipsum sit amet risus vehicula " +
-	"euismod in at nunc. Sed in viverra arcu, id blandit risus. Praesent sagittis " +
-	"quis nisl id molestie. Donec dignissim, nisl id volutpat consectetur, massa " +
-	"diam aliquam lectus, sed euismod leo elit eu justo. Integer vel ante " +
-	"sapien.";
+var fetchPromise = fetchFrontpageItems();
 
-var bookStorePage = createBookListPage("Book Store", "images/page_all_books.png", function () {
+var mainPage = createPerformanceListPage("Featured events", "images/page_all_books.png", function () {
 	return true;
 });
 
-createBookListPage("Popular", "images/page_popular_books.png", function (book) {
-	return book.popular;
+createPerformanceListPage("Coming up", "images/page_popular_books.png", function (performance) {
+	return _.contains(['scheduled', 'upcoming'], performance.State);
 });
 
-createBookListPage("Favorite", "images/page_favorite_books.png", function (book) {
-	return book.favorite;
+createPerformanceListPage("Live", "images/page_favorite_books.png", function (performance) {
+	return performance.State == 'live';
 });
 
 tabris.create("Action", {
 	title: "Settings",
 	image: {src: "images/action_settings.png", scale: 3}
 }).on("select", function () {
-	createSettingsPage().open();
+	Settings.createSettingsPage().open();
 });
 
-bookStorePage.open();
+mainPage.open();
 
-function createBookListPage(title, image, filter) {
+function createPerformanceListPage(title, image, filter) {
+	console.log('createPerformanceListPage ' );
 	return tabris.create("Page", {
 		title: title,
 		topLevel: true,
@@ -74,19 +64,19 @@ function createBookListPage(title, image, filter) {
 			src: image,
 			scale: 3
 		}
-	}).append(createBooksList(books.filter(filter)));
+	}).append(createPerformanceList(fetchPromise, filter));
 }
 
-function createBookPage(book) {
+function createPerformancePage(performance) {
 	var page = tabris.create("Page", {
-		title: book.title
+		title: performance.get('Title')
 	});
-	var detailsComposite = createDetailsView(book)
+	var detailsComposite = createDetailsView(performance)
 		.set("layoutData", {top: 0, height: 192, left: 0, right: 0})
 		.appendTo(page);
-	createTabFolder().set({
-		layoutData: {top: [detailsComposite, 0], left: 0, right: 0, bottom: 0}
-	}).appendTo(page);
+	//createTabFolder().set({
+	//	layoutData: {top: [detailsComposite, 0], left: 0, right: 0, bottom: 0}
+	//}).appendTo(page);
 	tabris.create("TextView", {
 		layoutData: {height: 1, right: 0, left: 0, top: [detailsComposite, 0]},
 		background: "rgba(0, 0, 0, 0.1)"
@@ -94,33 +84,58 @@ function createBookPage(book) {
 	return page;
 }
 
-function createDetailsView(book) {
+function createDetailsView(performance) {
+
 	var composite = tabris.create("Composite", {
 		background: "white",
 		highlightOnTouch: true
 	});
+
 	tabris.create("Composite", {
-		layoutData: {left: 0, right: 0, top: 0, height: 160 + 2 * PAGE_MARGIN}
+		layoutData: {
+			left: 0,
+			right: 0,
+			top: 0,
+			height: 160 + 2 * config.PAGE_MARGIN
+		}
 	}).on("tap", function () {
-		createReadBookPage(book).open();
+		createReadBookPage(performance).open();
 	}).appendTo(composite);
+
 	var coverView = tabris.create("ImageView", {
-		layoutData: {height: 160, width: 106, left: PAGE_MARGIN, top: PAGE_MARGIN},
-		image: book.image
+		layoutData: {
+			height: 160,
+			width: 106,
+			left: config.PAGE_MARGIN,
+			top: config.PAGE_MARGIN
+		},
+		image: cloudinary.url(performance.get('PosterImages')[0])
 	}).appendTo(composite);
 	var titleTextView = tabris.create("TextView", {
 		markupEnabled: true,
-		text: "<b>" + book.title + "</b>",
-		layoutData: {left: [coverView, PAGE_MARGIN], top: PAGE_MARGIN, right: PAGE_MARGIN}
+		text: "<h1>" + performance.get('Title') + "</h1>",
+		layoutData: {
+			left: [coverView, config.PAGE_MARGIN],
+			top: config.PAGE_MARGIN,
+			right: config.PAGE_MARGIN
+		}
 	}).appendTo(composite);
+
 	var authorTextView = tabris.create("TextView", {
-		layoutData: {left: [coverView, PAGE_MARGIN], top: [titleTextView, PAGE_MARGIN]},
-		text: book.author
+		layoutData: {
+			left: [coverView, config.PAGE_MARGIN],
+			top: [titleTextView, config.PAGE_MARGIN]
+		},
+		text: performance.get('HostingPerformer').get('StageName')
 	}).appendTo(composite);
+
 	tabris.create("TextView", {
-		layoutData: {left: [coverView, PAGE_MARGIN], top: [authorTextView, PAGE_MARGIN]},
+		layoutData: {
+			left: [coverView, config.PAGE_MARGIN],
+			top: [authorTextView, config.PAGE_MARGIN]
+		},
 		textColor: "rgb(102, 153, 0)",
-		text: "EUR 12,95"
+		text: performance.get('StartDate')
 	}).appendTo(composite);
 	return composite;
 }
@@ -128,91 +143,111 @@ function createDetailsView(book) {
 function createTabFolder() {
 	var tabFolder = tabris.create("TabFolder", {tabBarLocation: "top", paging: true});
 	var relatedTab = tabris.create("Tab", {title: "Related"}).appendTo(tabFolder);
-	createBooksList(books).appendTo(relatedTab);
+	createPerformanceList(books).appendTo(relatedTab);
 	var commentsTab = tabris.create("Tab", {title: "Comments"}).appendTo(tabFolder);
 	tabris.create("TextView", {
-		layoutData: {left: PAGE_MARGIN, top: PAGE_MARGIN, right: PAGE_MARGIN},
+		layoutData: {left: config.PAGE_MARGIN, top: config.PAGE_MARGIN, right: config.PAGE_MARGIN},
 		text: "Great Book."
 	}).appendTo(commentsTab);
 	return tabFolder;
 }
 
-function createBooksList(books) {
-	return tabris.create("CollectionView", {
+function createPerformanceList(performancePromise, filterFn) {
+
+	//console.log('createPerformanceList ' + performances.length);
+
+	var view = tabris.create("CollectionView", {
 		layoutData: {left: 0, right: 0, top: 0, bottom: 0},
 		itemHeight: 72,
-		items: books,
+		items: [],
+		refreshEnabled: true,
+		refreshIndicator: true,
+		refreshMessage: "Loading...",
 		initializeCell: function (cell) {
 			var imageView = tabris.create("ImageView", {
-				layoutData: {left: PAGE_MARGIN, centerY: 0, width: 32, height: 48},
+				layoutData: {left: config.PAGE_MARGIN, centerY: 0, width: 32, height: 48},
 				scaleMode: "fit"
 			}).appendTo(cell);
 			var titleTextView = tabris.create("TextView", {
-				layoutData: {left: 64, right: PAGE_MARGIN, top: PAGE_MARGIN},
+				layoutData: {left: 64, right: config.PAGE_MARGIN, top: config.PAGE_MARGIN},
 				markupEnabled: true,
 				textColor: "#4a4a4a"
 			}).appendTo(cell);
 			var authorTextView = tabris.create("TextView", {
-				layoutData: {left: 64, right: PAGE_MARGIN, top: [titleTextView, 4]},
+				layoutData: {left: 64, right: config.PAGE_MARGIN, top: [titleTextView, 4]},
 				textColor: "#7b7b7b"
 			}).appendTo(cell);
-			cell.on("change:item", function (widget, book) {
-				imageView.set("image", book.image);
-				titleTextView.set("text", book.title);
-				authorTextView.set("text", book.author);
+			cell.on("change:item", function (widget, performance) {
+				//console.log("change:item   " + JSON.stringify(performance));
+				//console.log("***\n\n\nchange:item   " + JSON.stringify(performance.get('Title')));
+				var imageUrl = cloudinary.url(performance.get('PosterImages')[0], {
+					crop: 'fill',
+					width: 320,
+					height: 200
+				});
+
+				//console.log("CLOUDINARY URL "+ imageUrl);
+				imageView.set("image", imageUrl);
+				titleTextView.set("text", performance.get('Title'));
+				authorTextView.set("text", performance.get('HostingPerformer').get('StageName'));
 			});
 		}
+	}).on("refresh", function() {
+		view.set({
+			refreshIndicator: true,
+			refreshMessage: "Loading..."
+		});
+
+		fetchFrontpageItems()
+			.then(function (result) {
+				//console.log("PERFORMANCELIST" + JSON.stringify(result));
+				view.set({
+					items: result,
+					refreshIndicator: false,
+					refreshMessage: ""
+				});
+			});
+
 	}).on("select", function (target, value) {
-		createBookPage(value).open();
+		createPerformancePage(value).open();
 	});
+
+	performancePromise.then(function(result){
+		view.set({
+			items: result.filter(filterFn),
+			refreshIndicator: false,
+			refreshMessage: ""
+		});
+	});
+	return view;
 }
 
-function createReadBookPage(book) {
-	var page = tabris.create("Page", {title: book.title});
+function fetchFrontpageItems() {
+	return Parse.Cloud.run('getFrontpageItems');
+}
+
+
+function createReadBookPage(performance) {
+	var page = tabris.create("Page", {title: performance.title});
 	var scrollView = tabris.create("ScrollView", {
 		layoutData: {left: 0, right: 0, top: 0, bottom: 0},
 		direction: "vertical"
 	}).appendTo(page);
 	var titleTextView = tabris.create("TextView", {
-		layoutData: {left: PAGE_MARGIN, top: PAGE_MARGIN * 2, right: PAGE_MARGIN},
+		layoutData: {left: config.PAGE_MARGIN, top: config.PAGE_MARGIN * 2, right: config.PAGE_MARGIN},
 		textColor: "rgba(0, 0, 0, 0.5)",
 		markupEnabled: true,
-		text: "<b>" + book.title + "</b>"
+		text: "<h1>" + performance.Title + "</h1>"
 	}).appendTo(scrollView);
 	tabris.create("TextView", {
-		layoutData: {left: PAGE_MARGIN, right: PAGE_MARGIN, top: [titleTextView, PAGE_MARGIN], bottom: PAGE_MARGIN},
-		text: [loremIpsum, loremIpsum, loremIpsum].join("\n\n")
+		layoutData: {
+			left: config.PAGE_MARGIN,
+			right: config.PAGE_MARGIN,
+			top: [titleTextView, config.PAGE_MARGIN],
+			bottom: config.PAGE_MARGIN
+		},
+		text: performance.Description
 	}).appendTo(scrollView);
 	return page;
 }
-
-function createSettingsPage() {
-	var page = tabris.create("Page", {
-		title: "License"
-	});
-	var settingsTextView = tabris.create("TextView", {
-		text: "Book covers come under CC BY 2.0",
-		layoutData: {left: PAGE_MARGIN, right: PAGE_MARGIN, top: PAGE_MARGIN}
-	}).appendTo(page);
-	var url = "https://www.flickr.com/photos/ajourneyroundmyskull/sets/72157626894978086/";
-	var linkTextView = tabris.create("TextView", {
-		text: "<a href=\"" + url + "\">Covers on flickr</a>",
-		markupEnabled: true,
-		layoutData: {left: PAGE_MARGIN, right: PAGE_MARGIN, top: [settingsTextView, 10]}
-	}).appendTo(page);
-	tabris.create("TextView", {
-		text: "<i>Authors of book covers:</i><br/>" +
-		"Paula Rodriguez - 1984<br/>" +
-		"Marc Storrs and Rob Morphy - Na Tropie Nieznanych<br/>" +
-		"Cat Finnie - Stary Czlowiek I Morze<br/>" +
-		"Andrew Brozyna - Hobbit<br/>" +
-		"Viacheslav Vystupov - Wojna Swiatow<br/>" +
-		"Marc Storrs and Rob Morphy - Zegar Pomaranczowy Pracz<br/>" +
-		"Andrew Evan Harner - Ksiega Dzungli",
-		markupEnabled: true,
-		layoutData: {left: PAGE_MARGIN, right: PAGE_MARGIN, top: [linkTextView, 10]}
-	}).appendTo(page);
-	return page;
-}
-
 
