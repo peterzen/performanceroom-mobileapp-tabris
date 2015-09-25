@@ -1,19 +1,13 @@
-var Parse = require('parse/index');
+//var Parse = require('parse/index');
 var _ = require('underscore');
 
 var config = require('./appConfig.json');
 
 var Settings = require('./Settings');
+var Database = require('./Database');
 var cloudinary = require('./Cloudinary');
 
-
-//console.log("DEBUG "+JSON.stringify(Parse));
-
-var books = require("./books.json");
-var performanceList = [];//require("./performances.json");
-
-Parse.initialize('E6h4Kw98VnlzpKsvUbaRq1wPnSEJHnfzChbYNG3c', '2pKmpiYpRzqnbnlsHGIcXRR9YyrfMsKUxSjqFxrE');
-
+Database.initialize();
 
 var drawer = tabris.create("Drawer");
 
@@ -32,7 +26,7 @@ tabris.create("PageSelector", {
 }).appendTo(drawer);
 
 
-var fetchPromise = fetchFrontpageItems();
+var fetchPromise = Database.fetchFrontpageItems();
 
 var mainPage = createPerformanceListPage("Featured events", "images/page_all_books.png", function () {
 	return true;
@@ -72,15 +66,28 @@ function createPerformancePage(performance) {
 		title: performance.get('Title')
 	});
 	var detailsComposite = createDetailsView(performance)
-		.set("layoutData", {top: 0, height: 192, left: 0, right: 0})
+		.set("layoutData", {
+			top: 0,
+			height: 192,
+			left: 0,
+			right: 0
+		})
 		.appendTo(page);
-	//createTabFolder().set({
-	//	layoutData: {top: [detailsComposite, 0], left: 0, right: 0, bottom: 0}
-	//}).appendTo(page);
+
+	createTabFolder(performance).set({
+		layoutData: {
+			top: [detailsComposite, 0],
+			left: 0,
+			right: 0,
+			bottom: 0
+		}
+	}).appendTo(page);
+
 	tabris.create("TextView", {
 		layoutData: {height: 1, right: 0, left: 0, top: [detailsComposite, 0]},
 		background: "rgba(0, 0, 0, 0.1)"
 	}).appendTo(page);
+
 	return page;
 }
 
@@ -140,15 +147,38 @@ function createDetailsView(performance) {
 	return composite;
 }
 
-function createTabFolder() {
-	var tabFolder = tabris.create("TabFolder", {tabBarLocation: "top", paging: true});
-	var relatedTab = tabris.create("Tab", {title: "Related"}).appendTo(tabFolder);
-	createPerformanceList(books).appendTo(relatedTab);
-	var commentsTab = tabris.create("Tab", {title: "Comments"}).appendTo(tabFolder);
+function createTabFolder(performance) {
+
+	var performer = performance.get('HostingPerformer');
+
+	var tabFolder = tabris.create("TabFolder", {
+		tabBarLocation: "top",
+		paging: true
+	});
+
+	var relatedTab = tabris.create("Tab", {
+		title: "More by " + performer.get('StageName')
+	}).appendTo(tabFolder);
+
+	var promise = Database.getEventsByPerformer(performer);
+
+	createPerformanceList(promise, function(){
+		return true;
+	}).appendTo(relatedTab);
+
+	var commentsTab = tabris.create("Tab", {
+		title: "Comments"
+	}).appendTo(tabFolder);
+
 	tabris.create("TextView", {
-		layoutData: {left: config.PAGE_MARGIN, top: config.PAGE_MARGIN, right: config.PAGE_MARGIN},
+		layoutData: {
+			left: config.PAGE_MARGIN,
+			top: config.PAGE_MARGIN,
+			right: config.PAGE_MARGIN
+		},
 		text: "Great Book."
 	}).appendTo(commentsTab);
+
 	return tabFolder;
 }
 
@@ -198,7 +228,7 @@ function createPerformanceList(performancePromise, filterFn) {
 			refreshMessage: "Loading..."
 		});
 
-		fetchFrontpageItems()
+		Database.fetchFrontpageItems()
 			.then(function (result) {
 				//console.log("PERFORMANCELIST" + JSON.stringify(result));
 				view.set({
@@ -213,6 +243,7 @@ function createPerformanceList(performancePromise, filterFn) {
 	});
 
 	performancePromise.then(function(result){
+		console.log('\n\n\n*** FETCH ' + JSON.stringify(result));
 		view.set({
 			items: result.filter(filterFn),
 			refreshIndicator: false,
@@ -220,10 +251,6 @@ function createPerformanceList(performancePromise, filterFn) {
 		});
 	});
 	return view;
-}
-
-function fetchFrontpageItems() {
-	return Parse.Cloud.run('getFrontpageItems');
 }
 
 
