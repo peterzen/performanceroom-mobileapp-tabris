@@ -276,28 +276,7 @@ function createPlayVideoView(performance){
 
 	return page;
 }
-//
-//function createReadBookPage(performance) {
-//	var page = tabris.create('Page', {title: performance.title});
-//	var scrollView = tabris.create('ScrollView', {
-//		layoutData: {left: 0, right: 0, top: 0, bottom: 0},
-//		direction: 'vertical'
-//	}).appendTo(page);
-//	var titleTextView = tabris.create('TextView', {
-//		layoutData: {left: config.PAGE_MARGIN, top: config.PAGE_MARGIN * 2, right: config.PAGE_MARGIN},
-//		textColor: 'rgba(0, 0, 0, 0.5)',
-//		markupEnabled: true,
-//		text: '<h1>' + performance.Title + '</h1>'
-//	}).appendTo(scrollView);
-//	tabris.create('TextView', {
-//		layoutData: {
-//			left: config.PAGE_MARGIN,
-//			right: config.PAGE_MARGIN,
-//			top: [titleTextView, config.PAGE_MARGIN],
-//			bottom: config.PAGE_MARGIN
-//		},
-//		text: performance.Description
-//	}).appendTo(scrollView);
-//	return page;
-//}
-//
+
+
+
+
