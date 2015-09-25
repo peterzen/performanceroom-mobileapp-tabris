@@ -12,7 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "https": "^1.0.0",
+    "node-parse-api": "^0.3.8",
     "parse": "^1.6.3",
-    "tabris": "^1.2.0"
+    "querystring": "^0.2.0",
+    "tabris": "^1.2.0",
+    "underscore": "^1.8.3",
+    "url": "^0.11.0"
   }
 }
