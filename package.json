@@ -2,7 +2,7 @@
   "name": "performanceroom-mobileapp",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "src/main.js",
   "directories": {
     "test": "test"
   },
@@ -10,5 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "parse": "^1.6.3",
+    "tabris": "^1.2.0"
+  }
 }
