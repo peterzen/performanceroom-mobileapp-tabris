@@ -1,0 +1,11 @@
+{
+  "PAGE_MARGIN": 16,
+  "parse": {
+    "appId": "E6h4Kw98VnlzpKsvUbaRq1wPnSEJHnfzChbYNG3c",
+    "javascriptKey": "2pKmpiYpRzqnbnlsHGIcXRR9YyrfMsKUxSjqFxrE"
+  },
+  "cloudinary": {
+    "cloud_name": "performanceroom",
+    "api_key": "889693341819856"
+  }
+}
