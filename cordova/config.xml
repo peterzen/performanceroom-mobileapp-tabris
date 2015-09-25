@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.performanceroom.mobileapp" version="1.0.0">
+    <name>PerformanceRoom</name>
+    <description>
+        Performance Room
+    </description>
+    <author email="peter@prioritylane.com" href="https://performanceroom.com">
+        Performance Room ltd
+    </author>
+</widget>
