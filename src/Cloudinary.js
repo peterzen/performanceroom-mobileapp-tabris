@@ -479,9 +479,7 @@ function cloudinary_url(public_id, options) {
 	var url = [prefix, resource_type_and_type, transformation, version ? "v" + version : "",
 		public_id].join("/").replace(/([^:])\/+/g, '$1/');
 
-	console.log("FUCK DEBUG " + url);
 	url = url.replace(/,/, '/');
-	console.log("FUCK DEBUG222 " + url);
 	return url;
 }
 
