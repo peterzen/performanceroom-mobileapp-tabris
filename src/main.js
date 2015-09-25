@@ -2,6 +2,7 @@
 var Parse = require('parse/index');
 var _ = require('underscore');
 
+var cloudinary = require('./Cloudinary');
 //console.log("DEBUG "+JSON.stringify(Parse));
 
 var PAGE_MARGIN = 16;
