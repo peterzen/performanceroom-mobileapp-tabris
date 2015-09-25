@@ -33,11 +33,11 @@ var mainPage = createPerformanceListPage('Featured events', 'images/page_all_boo
 });
 
 createPerformanceListPage('Coming up', 'images/page_popular_books.png', function (performance) {
-	return _.contains(['scheduled', 'upcoming'], performance.State);
+	return _.contains(['scheduled', 'upcoming'], performance.get('State'));
 });
 
 createPerformanceListPage('Live', 'images/page_favorite_books.png', function (performance) {
-	return performance.State == 'live';
+	return performance.get('State') == 'live';
 });
 
 tabris.create('Action', {
@@ -118,6 +118,8 @@ function createDetailsView(performance) {
 		},
 		image: cloudinary.url(performance.get('PosterImages')[0])
 	}).appendTo(composite);
+
+
 	var titleTextView = tabris.create('TextView', {
 		markupEnabled: true,
 		text: '<h1>' + performance.get('Title') + '</h1>',
@@ -187,26 +189,47 @@ function createPerformanceList(performancePromise, filterFn) {
 	//console.log('createPerformanceList ' + performances.length);
 
 	var view = tabris.create('CollectionView', {
-		layoutData: {left: 0, right: 0, top: 0, bottom: 0},
-		itemHeight: 72,
+		layoutData: {
+			left: 0,
+			right: 0,
+			top: 0,
+			bottom: 0
+		},
+		itemHeight: 120,
 		items: [],
 		refreshEnabled: true,
 		refreshIndicator: true,
 		refreshMessage: 'Loading...',
 		initializeCell: function (cell) {
 			var imageView = tabris.create('ImageView', {
-				layoutData: {left: config.PAGE_MARGIN, centerY: 0, width: 32, height: 48},
-				scaleMode: 'fit'
+				layoutData: {
+					left: config.PAGE_MARGIN,
+					centerY: 0,
+					width: 160,
+					height: 100
+				},
+				scaleMode: 'fill'
 			}).appendTo(cell);
+
 			var titleTextView = tabris.create('TextView', {
-				layoutData: {left: 64, right: config.PAGE_MARGIN, top: config.PAGE_MARGIN},
+				layoutData: {
+					left: 160 + 2 * config.PAGE_MARGIN,
+					right: config.PAGE_MARGIN,
+					top: config.PAGE_MARGIN
+				},
 				markupEnabled: true,
 				textColor: '#4a4a4a'
 			}).appendTo(cell);
+
 			var authorTextView = tabris.create('TextView', {
-				layoutData: {left: 64, right: config.PAGE_MARGIN, top: [titleTextView, 4]},
+				layoutData: {
+					left: 160 + 2 * config.PAGE_MARGIN,
+					right: config.PAGE_MARGIN,
+					top: [titleTextView, 4]
+				},
 				textColor: '#7b7b7b'
 			}).appendTo(cell);
+
 			cell.on('change:item', function (widget, performance) {
 				//console.log('change:item   ' + JSON.stringify(performance));
 				//console.log('***\n\n\nchange:item   ' + JSON.stringify(performance.get('Title')));
