@@ -2,6 +2,9 @@
 var Parse = require('parse/index');
 var _ = require('underscore');
 
+var config = require('./appConfig.json');
+
+var Settings = require('./Settings');
 var cloudinary = require('./Cloudinary');
 //console.log("DEBUG "+JSON.stringify(Parse));
 
