@@ -62,31 +62,119 @@ function createPerformanceListPage(title, image, filter) {
 }
 
 function createPerformancePage(performance) {
+
+	var imageUrl = cloudinary.url(performance.get('PosterImages')[0]);
+
 	var page = tabris.create('Page', {
 		title: performance.get('Title')
 	});
-	var detailsComposite = createDetailsView(performance)
-		.set('layoutData', {
-			top: 0,
-			height: 192,
-			left: 0,
-			right: 0
-		})
-		.appendTo(page);
 
-	createTabFolder(performance).set({
+	var scrollView = tabris.create('ScrollView', {
+		layoutData: {left: 0, right: 0, top: 0, bottom: 0}
+	}).appendTo(page);
+
+	var imageTextView = tabris.create('ImageView', {
+		layoutData: {left: 0, top: 0, right: 0}
+	}).appendTo(scrollView);
+
+	var titleComposite = tabris.create('Composite', {
+		id: 'titleComposite',
+		background: 'rgba(0,0,0,.4)',
 		layoutData: {
-			top: [detailsComposite, 0],
+			top: 0,
+			height: 60 + 3 * config.PAGE_MARGIN
+		}
+	}).appendTo(scrollView);
+
+	var titleView = tabris.create('TextView', {
+		layoutData: {left: config.PAGE_MARGIN, top: config.PAGE_MARGIN, right: config.PAGE_MARGIN},
+		markupEnabled: true,
+		text: '<b>' + performance.get('Title') + '</b>',
+		font: '24px',
+		textColor: 'white'
+	}).appendTo(titleComposite);
+
+
+	var contentComposite = tabris.create('Composite', {
+		layoutData: {
 			left: 0,
 			right: 0,
-			bottom: 0
-		}
-	}).appendTo(page);
+			top: '#titleComposite',
+			height: 1000
+		},
+		background: 'white'
+	}).appendTo(scrollView);
 
 	tabris.create('TextView', {
-		layoutData: {height: 1, right: 0, left: 0, top: [detailsComposite, 0]},
-		background: 'rgba(0, 0, 0, 0.1)'
-	}).appendTo(page);
+		layoutData: {left: config.PAGE_MARGIN, right: config.PAGE_MARGIN, top: config.PAGE_MARGIN},
+		text: performance.get('Description'),
+		font: '16px'
+	}).appendTo(contentComposite);
+
+
+	tabris.create('TextView', {
+		markupEnabled: true,
+		text: 'by <b>' + performance.get('HostingPerformer').get('StageName') + '</b>',
+		font: '16px',
+		layoutData: {left: config.PAGE_MARGIN,  top: [titleView, config.PAGE_MARGIN], right: config.PAGE_MARGIN},
+		textColor: 'white'
+	}).appendTo(contentComposite);
+
+	scrollView.on('resize', function(widget, bounds) {
+
+		var imageHeight = bounds.height / 1.778; // 1.4 is the image aspect ratio
+
+		imageTextView.set('image', {
+			src: imageUrl,
+			width: bounds.width,
+			height: bounds.height
+		});
+		var titleCompHeight = titleComposite.get('bounds').height;
+		// we need the offset of the title composite in each scroll event
+		// it can only change when a change:bounds is triggered, wo thats when we assign it
+		titleCompY = Math.min(imageHeight - titleCompHeight, bounds.height / 2);
+		titleComposite.set('layoutData', {left: 0, top: titleCompY, right: 0, height: 64});
+	});
+
+	scrollView.on('scroll', function(widget, offset) {
+		imageTextView.set('transform', {translationY: offset.y * 0.4});
+		if (titleCompY - offset.y < 0) {
+			titleComposite.set('transform', {translationY: offset.y - titleCompY});
+		} else {
+			titleComposite.set('transform', {translationY: 0});
+		}
+	});
+
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//var detailsComposite = createDetailsView(performance)
+	//	.set('layoutData', {
+	//		top: 0,
+	//		height: 192,
+	//		left: 0,
+	//		right: 0
+	//	})
+	//	.appendTo(page);
+
+	//createTabFolder(performance).set({
+	//	layoutData: {
+	//		top: [detailsComposite, 0],
+	//		left: 0,
+	//		right: 0,
+	//		bottom: 0
+	//	}
+	//}).appendTo(scrollView);
+	//
+	//tabris.create('TextView', {
+	//	layoutData: {height: 1, right: 0, left: 0, top: [detailsComposite, 0]},
+	//	background: 'rgba(0, 0, 0, 0.1)'
+	//}).appendTo(page);
 
 	return page;
 }
@@ -109,14 +197,18 @@ function createDetailsView(performance) {
 		createPlayVideoView(performance).open();
 	}).appendTo(composite);
 
+	var imageUrl = cloudinary.url(performance.get('PosterImages')[0]);
+	console.log('CLOUDINARY URL '+ imageUrl);
+
 	var coverView = tabris.create('ImageView', {
 		layoutData: {
-			height: 160,
-			width: 106,
-			left: config.PAGE_MARGIN,
-			top: config.PAGE_MARGIN
+			left: 0,
+			top: 0,
+			right: 0,
+			scaleMode: 'fill',
+			width: '100%'
 		},
-		image: cloudinary.url(performance.get('PosterImages')[0])
+		image: imageUrl
 	}).appendTo(composite);
 
 
@@ -124,8 +216,8 @@ function createDetailsView(performance) {
 		markupEnabled: true,
 		text: '<h1>' + performance.get('Title') + '</h1>',
 		layoutData: {
-			left: [coverView, config.PAGE_MARGIN],
-			top: config.PAGE_MARGIN,
+			left: config.PAGE_MARGIN,
+			//top: config.PAGE_MARGIN,
 			right: config.PAGE_MARGIN
 		}
 	}).appendTo(composite);
@@ -279,23 +371,23 @@ function createPerformanceList(performancePromise, filterFn) {
 
 function createPlayVideoView(performance){
 
-	var page = tabris.create("Page", {
-		title: "Video",
+	var page = tabris.create('Page', {
+		title: 'Video',
 		topLevel: true
 	});
 
-	var view = tabris.create("Video", {
+	var view = tabris.create('Video', {
 		layoutData: {
 			left: 0,
 			right: 0,
 			top: 0,
 			bottom: 0
 		},
-		url: "http://peach.themazzone.com/durian/movies/sintel-1280-stereo.mp4"
+		url: 'http://peach.themazzone.com/durian/movies/sintel-1280-stereo.mp4'
 	});
 
 	view.appendTo(page);
-	//tabris.ui.set("toolbarVisible", false);
+	//tabris.ui.set('toolbarVisible', false);
 
 	return page;
 }
