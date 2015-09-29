@@ -105,20 +105,21 @@ function createPerformancePage(performance) {
 		background: 'white'
 	}).appendTo(scrollView);
 
-	tabris.create('TextView', {
+	var subtitleView = tabris.create('TextView', {
+		markupEnabled: true,
+		text: 'by <b>' + performance.get('HostingPerformer').get('StageName') + '</b>',
+		font: '16px',
 		layoutData: {left: config.PAGE_MARGIN, right: config.PAGE_MARGIN, top: config.PAGE_MARGIN},
+		textColor: '#666666'
+	}).appendTo(contentComposite);
+
+	tabris.create('TextView', {
+		layoutData: {left: config.PAGE_MARGIN, right: config.PAGE_MARGIN, top: [subtitleView, config.PAGE_MARGIN]},
 		text: performance.get('Description'),
 		font: '16px'
 	}).appendTo(contentComposite);
 
 
-	tabris.create('TextView', {
-		markupEnabled: true,
-		text: 'by <b>' + performance.get('HostingPerformer').get('StageName') + '</b>',
-		font: '16px',
-		layoutData: {left: config.PAGE_MARGIN,  top: [titleView, config.PAGE_MARGIN], right: config.PAGE_MARGIN},
-		textColor: 'white'
-	}).appendTo(contentComposite);
 
 	scrollView.on('resize', function(widget, bounds) {
 
