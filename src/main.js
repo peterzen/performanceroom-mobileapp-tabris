@@ -71,6 +71,8 @@ function createPerformancePage(performance) {
 
 	var scrollView = tabris.create('ScrollView', {
 		layoutData: {left: 0, right: 0, top: 0, bottom: 0}
+	}).on('tap', function () {
+		createPlayVideoView(performance).open();
 	}).appendTo(page);
 
 	var imageTextView = tabris.create('ImageView', {
@@ -82,7 +84,7 @@ function createPerformancePage(performance) {
 		background: 'rgba(0,0,0,.4)',
 		layoutData: {
 			top: 0,
-			height: 60 + 3 * config.PAGE_MARGIN
+			//height: 60 + 3 * config.PAGE_MARGIN
 		}
 	}).appendTo(scrollView);
 
@@ -145,37 +147,6 @@ function createPerformancePage(performance) {
 			titleComposite.set('transform', {translationY: 0});
 		}
 	});
-
-
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//var detailsComposite = createDetailsView(performance)
-	//	.set('layoutData', {
-	//		top: 0,
-	//		height: 192,
-	//		left: 0,
-	//		right: 0
-	//	})
-	//	.appendTo(page);
-
-	//createTabFolder(performance).set({
-	//	layoutData: {
-	//		top: [detailsComposite, 0],
-	//		left: 0,
-	//		right: 0,
-	//		bottom: 0
-	//	}
-	//}).appendTo(scrollView);
-	//
-	//tabris.create('TextView', {
-	//	layoutData: {height: 1, right: 0, left: 0, top: [detailsComposite, 0]},
-	//	background: 'rgba(0, 0, 0, 0.1)'
-	//}).appendTo(page);
 
 	return page;
 }
