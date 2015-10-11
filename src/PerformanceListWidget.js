@@ -5,20 +5,7 @@ var config = require('./appConfig.json');
 var cloudinary = require('./Cloudinary');
 
 
-function createPerformanceListPage(fetchPromise, title, image, filter) {
-	console.log('createPerformanceListPage ' );
-	return tabris.create('Page', {
-		title: title,
-		topLevel: true,
-		image: {
-			src: image,
-			scale: 3
-		}
-	}).append(createPerformanceList(fetchPromise, filter));
-}
-
-
-function createPerformanceList(performancePromise, filterFn) {
+function createPerformanceList(performancePromise, filterFn, onSelectFn) {
 
 	//console.log('createPerformanceList ' + performances.length);
 
@@ -95,9 +82,7 @@ function createPerformanceList(performancePromise, filterFn) {
 				});
 			});
 
-	}).on('select', function (target, value) {
-		createPerformancePage(value).open();
-	});
+	}).on('select', onSelectFn);
 
 	performancePromise.then(function(result){
 		//console.log('\n\n\n*** FETCH ' + JSON.stringify(result));
@@ -112,5 +97,5 @@ function createPerformanceList(performancePromise, filterFn) {
 
 
 module.exports = {
-	createPerformanceListPage: createPerformanceListPage
+	createPerformanceList: createPerformanceList
 };
