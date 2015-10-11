@@ -36,13 +36,6 @@ function createSettingsPage() {
 		layoutData: {left: config.PAGE_MARGIN, right: config.PAGE_MARGIN, top: [linkTextView, 10]}
 	}).appendTo(page);
 
-	tabris.create('Action', {
-		title: 'Settings',
-		image: {src: 'images/action_settings.png', scale: 3}
-	}).on('select', function () {
-		Settings.createSettingsPage().open();
-	});
-
 	return page;
 }
 
