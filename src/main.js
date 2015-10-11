@@ -1,21 +1,18 @@
-//var Parse = require('parse/index');
+
 var _ = require('underscore');
 
 var config = require('./appConfig.json');
+var Database = require('./Database');
 
 var Settings = require('./Settings');
-var Database = require('./Database');
-var cloudinary = require('./Cloudinary');
-
 var Drawer = require('./Drawer');
-var audiencePages = require('./Audience/BrowsePerformancesPage');
+var AudiencePages = require('./Audience/BrowsePerformancesPage');
 
 Database.initialize();
 
 Drawer.initialize();
 Settings.initialize();
-
-var browsePages = audiencePages.initialize();
+var browsePages = AudiencePages.initialize();
 
 browsePages.featured.open();
 
