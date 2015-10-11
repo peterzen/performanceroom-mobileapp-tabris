@@ -7,24 +7,11 @@ var Settings = require('./Settings');
 var Database = require('./Database');
 var cloudinary = require('./Cloudinary');
 
+var drawer = require('./Drawer');
+
 Database.initialize();
 
-var drawer = tabris.create('Drawer');
-
-tabris.create('ImageView', {
-	image: 'images/cover.jpg',
-	scaleMode: 'fill',
-	layoutData: {
-		left: 0, right: 0, top: 0, height: 200
-	}
-}).appendTo(drawer);
-
-tabris.create('PageSelector', {
-	layoutData: {
-		left: 0, top: 200, right: 0, bottom: 0
-	}
-}).appendTo(drawer);
-
+drawer.initialize();
 
 var fetchPromise = Database.fetchFrontpageItems();
 
