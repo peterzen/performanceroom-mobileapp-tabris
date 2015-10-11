@@ -15,7 +15,6 @@ function initialize() {
 			right: 0,
 			bottom: 0
 		},
-		background: '#00ff00',
 		topLevel: true
 	});
 
@@ -30,13 +29,8 @@ function initialize() {
 			left: 0,
 			right: 0,
 			top: 0,
-			bottom: 0,
-			//centerX: 0,
-			//centerY: 0,
-			//width: '100%',
-			//height: '100%'
+			bottom: 0
 		},
-		background: '#ff0000',
 		image: {
 			src: imageUrl
 		},
