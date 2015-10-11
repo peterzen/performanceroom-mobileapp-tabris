@@ -1,5 +1,8 @@
 {
   "PAGE_MARGIN": 16,
+  "content": {
+    "MainCoverImage": "Assets/MainCoverImage"
+  },
   "parse": {
     "appId": "E6h4Kw98VnlzpKsvUbaRq1wPnSEJHnfzChbYNG3c",
     "javascriptKey": "2pKmpiYpRzqnbnlsHGIcXRR9YyrfMsKUxSjqFxrE"
