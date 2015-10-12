@@ -2,7 +2,7 @@
 
 cd vendor-packages
 
-unzip *.zip
+for i in *.zip; do unzip $i; done
 
 cd ../
 
