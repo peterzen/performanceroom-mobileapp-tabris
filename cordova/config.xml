@@ -12,6 +12,6 @@
     </preferences>
     <access origin="*" />
     <plugin name="cordova-plugin-dialogs" version="1.1.1" />
-    <plugin name="cordova-plugin-inappbrowser" spec="^0.6.0" />
-    <plugin name="com.oauthio.plugins.oauthio" spec="https://github.com/oauth-io/oauth-phonegap" />
+    <plugin name="cordova-plugin-console" spec="~1.0.1" />
+    <plugin name="cordova-plugin-inappbrowser" spec="~1.0.1" />
 </widget>
