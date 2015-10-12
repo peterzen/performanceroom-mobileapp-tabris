@@ -13,7 +13,7 @@
     <access origin="*" />
     <plugin name="cordova-plugin-camera" version="1.2.0" />
     <plugin name="cordova-plugin-dialogs" version="1.1.1" />
-    <plugin name="com.oauthio.plugins.oauthio" />
+    <plugin name="com.oauthio.plugins.oauthio" version="0.2.4" />
     <plugin name="cordova-plugin-x-toast" spec="https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin" />
     <plugin name="nl.x-services.plugins.calendar" spec="^4.3.4" />
     <plugin name="org.apache.cordova.inappbrowser" spec="^0.6.0" />
