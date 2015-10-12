@@ -1,5 +1,5 @@
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 var config = require('./appConfig.json');
 var cloudinary = require('./Cloudinary');
