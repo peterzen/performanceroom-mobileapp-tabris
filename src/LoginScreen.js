@@ -62,6 +62,15 @@ function initialize() {
 			//console.log('DDDD');
 		};
 
+		console.log('OAUTH ***** ', cordova);
+
+		cordova.InAppBrowser.open('http://google.com');
+
+		//cordova.exec(noop, noop, "InAppBrowser", "open", ["http://google.com", "_system"]);
+
+return;
+
+
 		try {
 			OAuth.initialize('WgKtCq-YCLB1fK5tNxzHF1XPxxg');
 			OAuth.popup('facebook')
@@ -89,7 +98,6 @@ function initialize() {
 		}
 
 
-		//cordova.exec(noop, noop, "InAppBrowser", "open", ["http://google.com", "_system"]);
 		//cordova.exec(noop, noop, "OAuth", "authenticate", ["http://google.com", "_system"]);
 
 	});
