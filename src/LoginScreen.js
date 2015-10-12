@@ -3,6 +3,9 @@ var _ = require('underscore');
 var config = require('./appConfig.json');
 var cloudinary = require('./Cloudinary');
 
+//require('cordova-plugin-inappbrowser');
+
+//var OAuth = require('./OAuth');
 
 function initialize() {
 
@@ -31,9 +34,9 @@ function initialize() {
 			top: 0,
 			bottom: 0
 		},
-		image: {
-			src: imageUrl
-		},
+		//image: {
+		//	src: imageUrl
+		//},
 		scaleMode: 'fill'
 	}).appendTo(page);
 
@@ -54,7 +57,41 @@ function initialize() {
 	}).appendTo(page);
 
 	button.on('select', function () {
-		textView.set('text', 'Totally Rock!');
+		var noop = function() {
+			textView.set('text', JSON.stringify(arguments));
+			//console.log('DDDD');
+		};
+
+		try {
+			OAuth.initialize('WgKtCq-YCLB1fK5tNxzHF1XPxxg');
+			OAuth.popup('facebook')
+				.done(function (result) {
+					noop(result);
+				})
+				.fail(function (error) {
+					console.log(error);
+					noop(error);
+				});
+
+			//OAuth.authenticate(function (result) {
+			//	console.log('OAUTH ***** ' + JSON.stringify(result));
+			//});
+		}
+		catch(e){
+			console.log('OAuth.authenticate '+JSON.stringify(e));
+		}
+
+		try {
+			cordova.exec(noop, noop, "OAuth", "popup", 'facebook');
+		}
+		catch(e){
+			console.log('OAuth.authenticate '+JSON.stringify(e));
+		}
+
+
+		//cordova.exec(noop, noop, "InAppBrowser", "open", ["http://google.com", "_system"]);
+		//cordova.exec(noop, noop, "OAuth", "authenticate", ["http://google.com", "_system"]);
+
 	});
 
 	return page;

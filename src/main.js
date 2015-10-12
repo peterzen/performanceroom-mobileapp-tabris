@@ -11,6 +11,12 @@ var LoginScreen = require('./LoginScreen');
 
 Database.initialize();
 
+//console.log("DEBUG"+JSON.stringify(cordova));
+
+
+
+//OAuth.initialize('WgKtCq-YCLB1fK5tNxzHF1XPxxg');
+
 Drawer.initialize();
 Settings.initialize();
 
