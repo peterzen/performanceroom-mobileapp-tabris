@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -rf platforms/*
+
 cd vendor-packages
 
 ls | grep -v .zip | xargs rm -r
