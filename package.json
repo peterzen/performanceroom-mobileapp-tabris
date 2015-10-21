@@ -23,7 +23,7 @@
     "node-parse-api": "^0.3.8",
     "parse": "^1.6.3",
     "querystring": "^0.2.0",
-    "tabris": "^1.2.0",
+    "tabris": "^1.3.0",
     "underscore": "^1.8.3",
     "url": "^0.11.0"
   }
