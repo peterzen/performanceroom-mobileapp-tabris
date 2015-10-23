@@ -3,11 +3,15 @@ var _ = require('lodash');
 var config = require('./appConfig.json');
 var cloudinary = require('./Cloudinary');
 
-//require('cordova-plugin-inappbrowser');
-
-//var OAuth = require('./OAuth');
+var Auth0Lock = require('auth0-lock/standalone');
 
 function initialize() {
+
+	var lock = new Auth0Lock(
+		'Ie1dlpqy8TnIhAQyajPzVLyyq10IQZZL',
+		'performanceroom.eu.auth0.com'
+	);
+
 
 
 	var page = tabris.create('Page', {
@@ -57,48 +61,32 @@ function initialize() {
 	}).appendTo(page);
 
 	button.on('select', function () {
-		var noop = function() {
+		var callback = function() {
 			textView.set('text', JSON.stringify(arguments));
 			//console.log('DDDD');
 		};
 
 		console.log('OAUTH ***** ', cordova);
 
-		cordova.InAppBrowser.open('http://google.com');
+		lock.show(function(err, profile, token) {
+			if (err) {
+				// Error callback
+				console.log("There was an error");
+				alert("There was an error logging in");
+			} else {
 
-		//cordova.exec(noop, noop, "InAppBrowser", "open", ["http://google.com", "_system"]);
+				// Success calback
 
-return;
+				alert(JSON.stringify(profile));
+				//
+				//// Save the JWT token.
+				//localStorage.setItem('userToken', token);
 
-
-		try {
-			OAuth.initialize('WgKtCq-YCLB1fK5tNxzHF1XPxxg');
-			OAuth.popup('facebook')
-				.done(function (result) {
-					noop(result);
-				})
-				.fail(function (error) {
-					console.log(error);
-					noop(error);
-				});
-
-			//OAuth.authenticate(function (result) {
-			//	console.log('OAUTH ***** ' + JSON.stringify(result));
-			//});
-		}
-		catch(e){
-			console.log('OAuth.authenticate '+JSON.stringify(e));
-		}
-
-		try {
-			cordova.exec(noop, noop, "OAuth", "popup", 'facebook');
-		}
-		catch(e){
-			console.log('OAuth.authenticate '+JSON.stringify(e));
-		}
+			}
+		});
 
 
-		//cordova.exec(noop, noop, "OAuth", "authenticate", ["http://google.com", "_system"]);
+		//cordova.InAppBrowser.open('http://google.com');
 
 	});
 
@@ -108,3 +96,7 @@ return;
 module.exports = {
 	initialize: initialize
 };
+
+
+
+
