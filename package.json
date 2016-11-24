@@ -12,16 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "auth0-lock": "^7.10.1",
+    "auth0-lock": "^10.7.0",
     "cloudinary": "^1.2.4",
     "crypto": "0.0.3",
     "formatjs": "^0.1.1",
     "fs": "0.0.2",
     "https": "^1.0.0",
-    "jquery": "^2.1.4",
-    "lodash": "^3.10.1",
+    "jquery": "^3.1.1",
+    "lodash": "^4.17.2",
     "moment": "^2.10.6",
-    "moment-timezone": "^0.4.0",
+    "moment-timezone": "^0.5.9",
     "node-parse-api": "^0.3.8",
     "parse": "^1.6.3",
     "querystring": "^0.2.0",
@@ -32,6 +32,6 @@
   "devDependencies": {
     "sax": "^1.1.4",
     "xml2js": "^0.4.13",
-    "xmlbuilder": "^3.1.0"
+    "xmlbuilder": "^8.2.2"
   }
 }
