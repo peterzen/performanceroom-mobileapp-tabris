@@ -8,7 +8,7 @@ var Auth0Lock = require('auth0-lock/standalone');
 function initialize() {
 
 	var lock = new Auth0Lock(
-		'Ie1dlpqy8TnIhAQyajPzVLyyq10IQZZL',
+		'',
 		'performanceroom.eu.auth0.com'
 	);
 
